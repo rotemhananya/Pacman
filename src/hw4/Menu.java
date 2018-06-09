@@ -15,7 +15,7 @@ import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 
 /** This class represents the first window the user sees, when entering the game.
- * This class also has the 
+ * This class also has the main method.
  * In this window the user chooses the board that he wants to play in. 
  * 
  * @author Rotem Hananya
@@ -23,7 +23,7 @@ import javax.swing.ButtonGroup;
  */
 public class Menu extends JFrame implements ActionListener{
 
-	private Boards board; //
+	private Boards boards; //
 	private Pictures pics;
 	private JLabel lblLogo;
 	private JTextField txtChooseABoard;
@@ -45,15 +45,15 @@ public class Menu extends JFrame implements ActionListener{
 	 * @param board - all of the boards options.
 	 * 
 	 */
-	public Menu(Pictures pics, Boards board) {
+	public Menu(Pictures pics, Boards boards) {
 		super ("Menu");
 		this.pics = pics;
-		this.board = board;
+		this.boards = boards;
 		initialize();
 	}
 
 	/**
-	 * This function initialize the contents of the frame and when the button "Start" is pressed, stats the game.
+	 * This function initialize the contents of the frame and when the button "Start" is pressed, starts the game.
 	 */
 	private void initialize() {
 		getContentPane().setBackground(Color.BLACK); 
@@ -176,7 +176,7 @@ public class Menu extends JFrame implements ActionListener{
 			public void actionPerformed(ActionEvent arg0) { // Starting a new game with the chosen board and closing this window
 
 				int chosenBoard;
-				if (rdbtnOne.isSelected()) // checking which butteon is selected
+				if (rdbtnOne.isSelected()) // checking which button is selected
 					chosenBoard = 1;
 				else if (rdbtnTwo.isSelected())
 					chosenBoard = 2;
@@ -185,7 +185,7 @@ public class Menu extends JFrame implements ActionListener{
 				else 
 					chosenBoard = 4;
 
-				new BoardGame(board.getBoard(chosenBoard)); // Starting a new game with the chosen board
+				new BoardGame(boards,pics,boards.getBoard(chosenBoard),3); // Starting a new game with the chosen board
 				dispose(); // closing this window
 			}
 		});
@@ -196,9 +196,9 @@ public class Menu extends JFrame implements ActionListener{
 		getContentPane().add(btnStart); // adding btnStart to the frame
 
 		lblPacman = new JLabel("");  // this label holds a gif of pacman 
-		lblPacman.setBounds(60,601,680,154);
-		ImageIcon imPacman = pics.getPic(5);
-		Image resizedImPacman = imPacman.getImage().getScaledInstance(680, 360, 0); // cutting the image
+		lblPacman.setBounds(60,500,680,350);
+		ImageIcon imPacman = pics.getPic(6);
+		Image resizedImPacman = imPacman.getImage().getScaledInstance(680, 350, 0); // cutting the image
 		imPacman.setImage(resizedImPacman);
 		lblPacman.setIcon(imPacman); // changing lblPacman's icon
 		getContentPane().add(lblPacman);  // adding lblPacman to the frame

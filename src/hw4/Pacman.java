@@ -1,11 +1,20 @@
 package hw4;
 
+import javax.swing.ImageIcon;
+
 /**
  * 
  * This class represents the pacman character.
  *
  */
-public class Pacman extends Creature {
+public class Pacman extends Creature implements Visited{
+	private ImageIcon imLevel1 = new ImageIcon("***.png");
+	private ImageIcon imLevel2 = new ImageIcon("***.png");
+	private ImageIcon imLevel3 = new ImageIcon("***.png");
+	private int level=1;
+	private int life=3;
+	private int points=0;
+	private double speed = 5;
 	private int x;
 	private int y;
 	private int radius;
@@ -22,6 +31,11 @@ public class Pacman extends Creature {
 		this.radius=radius;
 	}
 
+	public Pacman(int x, int y) {
+		this.x=x;
+		this.y=y;
+	}
+	
 	public boolean inPosition(int x, int y) { 
 		boolean ans=false;
 		if (this.x>x) { // if the pacman x is greater then the given x
@@ -71,4 +85,81 @@ public class Pacman extends Creature {
 	public int getY() {
 		return this.y;
 	}
+
+	@Override
+	public ImageIcon getImage() {
+		if (level==1)
+			return this.imLevel1;
+		else if (level==2)
+			return this.imLevel2;
+		else
+			return this.imLevel3;
+	}
+
+	@Override
+	public double getSpeed() {
+		return this.speed;
+	}
+
+	public void visit(Ginkey ginkey) {
+		if (level==1)
+			this.life-=1;
+		//else if (level==2)
+			//ginky disappears for 5 seconds
+		//	else
+				//ginky dies
+
+	}
+
+	@Override
+	public void visit(Inky inky) {
+		if (level==1)
+			return;
+		else if (level==2) {
+			// pacman can't move for 5 seconds
+			this.points-=10;
+		}
+	//	else
+			//inky freezes for 5 seconds
+	}
+
+	@Override
+	public void visit(Blinky blinky) {
+		if (level==3)
+			this.life-=1;
+
+	}
+
+	@Override
+	public void visit(FireBalls firaBalls) {
+		if (level==3)
+			this.life-=1;
+	}
+
+	@Override
+	public void visit(WaterSplash waterSplash) {
+		if (level==1)
+			return;
+		else if (level==2) {
+			//pacman disappears for 3 seconds
+			this.points-=10;
+		}
+		//else
+			//inky freezes for 5 seconds
+
+	}
+
+
+	@Override
+	public void accept(Visitor visitor) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(Pacman pacman) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
