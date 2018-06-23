@@ -1,4 +1,4 @@
-package timer;
+package Timer;
 
 /**
  * This class represents the TimerListener interface.
@@ -6,5 +6,7 @@ package timer;
 public interface TimerListener {
 
 	void action();
+	
+	int getSpeed();
 
 }

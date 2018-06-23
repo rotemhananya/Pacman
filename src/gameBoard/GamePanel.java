@@ -1,64 +1,191 @@
-package gameBoard;
+package GameBoard;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.SystemColor;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.image.ImageObserver;
+import java.util.Random;
 
-import javax.swing.ImageIcon;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
-import collections.Pictures;
-import creatures.Blinky;
-import creatures.EnergyPills;
-import creatures.Ginkey;
-import creatures.Inky;
-import creatures.Pacman;
-import timer.MyTimer;
-import timer.TimerListener;
-import windows.GameFrame;
-import windows.GameOver;
+import Ghosts.Blinky;
+import Ghosts.Freaky;
+import Ghosts.Ghost;
+import Ghosts.Ginkey;
+import Ghosts.Inky;
+import Ghosts.Pinky;
+import GhostsWeapons.FireBalls;
+import GhostsWeapons.WaterSplash;
+import Timer.MyTimer;
+import Timer.TimerListener;
+import Collections.Pictures;
+import Food.EnergyPill;
+import Food.Pineapple;
+import Food.Apple;
+import Food.Strawberry;
+import Food.Batteries;
+import Food.Cherry;
+import Pacman.Pacman;
+import Pacman.Pacman1;
+import Pacman.Pacman2;
+import Pacman.Pacman3;
+import Windows.GameFrame;
+import Windows.GameOver;
 
 public class GamePanel extends JPanel implements KeyListener, TimerListener{
-	private GameFrame frame;
-	private Pictures pics;
-	private int[][] boardGame;
-	private EnergyPills energyPills;
-	private int boardSize = 800; // the size of the game's board
+	private GameFrame Frame;
+	private Pictures Pics;
+	private int[][] BoardGame;
+	private EnergyPill[] EnergyPill1;
+	private Pineapple[] Pineapple1;
+	private Apple[] Apple1;	
+	private Cherry[] Cherry1;	
+	private Batteries[] Batteries1;
+	private Strawberry[] Strawberry1;
+
 	private int PixelSize = 20; // the size of the pixels in the board
 	private final int FOOD=1, WALL=3, PATH=5;
 	
-	private Pacman pacman = new Pacman(17, 19);
-	private Ginkey ginkey; 
-	private Inky inky;
-	private Blinky blinky;
 
+	private Pacman Pacman;
+	private Pacman1 Pacman1;
+	private Pacman2 Pacman2;
+	private Pacman3 Pacman3;
+	private Ghost[] Ghost;
+	private Ginkey Ginkey; 
+	private Inky Inky;
+	private Blinky Blinky;
+	private Pinky Pinky;
+	private Freaky Freaky;
+
+	
 	private int Sec=0; // the time that passed
-	private int numOfFood=240;
-	private static String stringTime="00:00:00";
-	private boolean startGame=false; // whether the game was started
+	private int NumOfNormalPills=0;
+	private static String StringTime="00:00:00";
+	private boolean StartGame=false; // whether the game started
+	private boolean SpeedGame=false;
 
 	/**
 	 * GamePanel's constructor.
 	 * 
-	 * @param g - the frame of the game.
-	 * @param life - the amount of lives pacman has.
+	 * @param g - the Frame of the game.
+	 * @param life - the amount of lives Pacman has.
 	 * @param chosenBoard - the board that was chosen.
 	 */
-	public GamePanel (GameFrame g, int life, int chosenBoard) {
-		this.frame=g;
-		this.boardGame = g.getBoards().getBoard(chosenBoard);
-		this.pics=g.getPics();
+	public GamePanel (GameFrame g, int chosenBoard) {
+		this.Frame=g;
+		this.BoardGame = g.getBoards().getBoard(chosenBoard);
+		this.Pics=g.getPics();
 		setPreferredSize(new Dimension(800, 800));
 		addKeyListener(this);
 		setFocusable(true);
 		setRequestFocusEnabled(true);
-		MyTimer.getInstance(1).add(this);
-		ginkey=new Ginkey(19,19,this.boardGame); 
-		inky=new Inky(19,18,this.boardGame); 
-		blinky=new Blinky(19,20,this.boardGame); 
+		MyTimer.getInstance().add(this);
+		Pacman=new Pacman1();	
+		Pacman1=(Pacman1) Pacman;
+		Ginkey=new Ginkey(19,19,this); 
+		Inky=new Inky(19,18,this); 
+		Blinky=new Blinky(19,20,this); 
+		Pinky=new Pinky(19,21,this);
+		Freaky=new Freaky(19,17,this);
+		updateGhost();
+		initFruits();
+	}
+
+	private void updateGhost() {
+		Ghost = new Ghost[5];
+		Ghost[0]=Ginkey;
+		Ghost[1]=Inky;
+		Ghost[2]=Blinky;
+		Ghost[3]=Pinky;
+		Ghost[4]=Freaky;
+	}
+
+
+	/**
+	 * This class initiates the food that is on the board.
+	 */
+	private void initFruits() {
+		if (this.Pacman.getLevel()==1) {
+
+			EnergyPill1=new EnergyPill[4];
+			Pineapple1=new Pineapple[2];
+			Apple1=new Apple[2];
+			Cherry1=new Cherry[1];
+			Batteries1=new Batteries[1];
+			Strawberry1=new Strawberry[1];
+
+			EnergyPill1[0]=new EnergyPill(1, 1, this, true);
+			EnergyPill1[1]=new EnergyPill(1, 38, this, true);
+			EnergyPill1[2]=new EnergyPill(38, 1, this, true);
+			EnergyPill1[3]=new EnergyPill(38, 38, this, true);
+			Pineapple1[0]=new Pineapple(this);
+			Pineapple1[1]=new Pineapple(this);
+			Apple1[0]=new Apple(this);
+			Apple1[1]=new Apple(this);	
+			Cherry1[0]=new Cherry(this);	
+			Batteries1[0]=new Batteries(this);
+			Strawberry1[0]=new Strawberry(this);
+
+
+		}
+		else if(this.Pacman.getLevel()==2) {
+			EnergyPill1=new EnergyPill[4];
+			Pineapple1=new Pineapple[4];
+			Apple1=new Apple[4];
+			Cherry1=new Cherry[1];
+			Batteries1=new Batteries[1];
+			Strawberry1=new Strawberry[1];
+			EnergyPill1[0]=new EnergyPill(1, 1, this, true);
+			EnergyPill1[1]=new EnergyPill(1, 38, this, true);
+			EnergyPill1[2]=new EnergyPill(38, 1, this, true);
+			EnergyPill1[3]=new EnergyPill(38, 38, this, true);
+			Pineapple1[0]=new Pineapple(this);
+			Pineapple1[1]=new Pineapple(this);
+			Pineapple1[2]=new Pineapple(this);
+			Pineapple1[3]=new Pineapple(this);
+			Apple1[0]=new Apple(this);
+			Apple1[1]=new Apple(this);
+			Apple1[2]=new Apple(this);
+			Apple1[3]=new Apple(this);
+			Cherry1[0]=new Cherry(this);
+			Batteries1[0]= new Batteries(this);
+			Strawberry1[0]=new Strawberry(this);
+
+		}
+		else {
+			EnergyPill1=new EnergyPill[4];
+			Pineapple1=new Pineapple[5];
+			Apple1=new Apple[5];
+			Cherry1=new Cherry[1];
+			Batteries1=new Batteries[1];
+			Strawberry1=new Strawberry[2];
+			EnergyPill1[0]=new EnergyPill(1, 1, this, true);
+			EnergyPill1[1]=new EnergyPill(1, 38, this, true);
+			EnergyPill1[2]=new EnergyPill(38, 1, this, true);
+			EnergyPill1[3]=new EnergyPill(38, 38, this, true);
+			Pineapple1[0]=new Pineapple(this);
+			Pineapple1[1]=new Pineapple(this);
+			Pineapple1[2]=new Pineapple(this);
+			Pineapple1[3]=new Pineapple(this);
+			Pineapple1[4]=new Pineapple(this);
+			Apple1[0]=new Apple(this);
+			Apple1[1]=new Apple(this);
+			Apple1[2]=new Apple(this);
+			Apple1[3]=new Apple(this);
+			Apple1[4]=new Apple(this);
+			Cherry1[0]=new Cherry(this);
+			Batteries1[0]=new Batteries(this);
+			Strawberry1[0]=new Strawberry(this);
+			Strawberry1[1]=new Strawberry(this);
+
+		}
 	}
 
 	/**
@@ -67,60 +194,157 @@ public class GamePanel extends JPanel implements KeyListener, TimerListener{
 	 */
 	public void paint(Graphics g) {
 		super.paintComponent(g);
-		Image offIm = createImage(boardSize, boardSize);
+		Image offIm = createImage(800, 800);
 		Graphics g2 = offIm.getGraphics();
 		int counter=0;
 
-		for(int i=0; i<this.boardGame.length; i++) 
-			for(int j=0; j<this.boardGame.length; j++) {
-				if (this.boardGame[i][j]==WALL) { // wall
-					g2.setColor(Color.GRAY);
+		for(int i=0; i<this.BoardGame.length; i++) 
+			for(int j=0; j<this.BoardGame.length; j++) {
+				if (this.BoardGame[i][j]==WALL) { // wall
+					g2.drawImage(this.Frame.getPics().getBlockPic(0).getImage(), this.PixelSize*j, this.PixelSize*i, this.PixelSize, this.PixelSize, null);
+				}
+				else if (this.BoardGame[i][j]==PATH) { // path
+					g2.setColor(Color.BLACK);
 					g2.fillRect(j*PixelSize, i*PixelSize, PixelSize, PixelSize);
 				}
-				else if (this.boardGame[i][j]==PATH) { // path
-					g2.setColor(Color.WHITE);
-					g2.fillRect(j*PixelSize, i*PixelSize, PixelSize, PixelSize);
-				}
-				else if (this.boardGame[i][j]==FOOD) { // food
+				else if (this.BoardGame[i][j]==FOOD) { // food
 					counter++;
-					g2.setColor(Color.LIGHT_GRAY);
-					g2.fillOval(j*PixelSize, i*PixelSize, PixelSize, PixelSize);
+					g2.drawImage(this.Frame.getPics().getFoodPic(0).getImage(), this.PixelSize*j, this.PixelSize*i, this.PixelSize, this.PixelSize, null);
 				}
-
-				this.frame.setTextTime(this.stringTime);
-				this.pacman.setSecTime(Sec);
-
-				if (this.Sec - this.pacman.getFreezeCounter()==5)
-					this.pacman.setFreezeCounter(0);
-
-				if (this.Sec - this.inky.getFreezeCounter()==5)
-					this.inky.setFreezeCounter(0);
-
-				if (this.Sec==7000) // releasing ginkey
-					this.ginkey.setStartMoving(true); // green
-
-				if (this.Sec==2000) // releasing inky
-					this.inky.setStartMoving(true) ;//yellow
-
-				if (this.Sec==1) // releasing blinky
-					this.blinky.setStartMoving(true);//red
-
-				// drawing pacman and the gusts 
-				g2.drawImage(this.pacman.getImage().getImage(), this.PixelSize*this.pacman.getY(), this.PixelSize*this.pacman.getX(), this.PixelSize, this.PixelSize, null);
-				g2.drawImage(this.inky.getImage().getImage(), this.PixelSize*this.inky.getY(), this.PixelSize*this.inky.getX(), this.PixelSize, this.PixelSize, null);
-				g2.drawImage(this.blinky.getImage().getImage(), this.PixelSize*this.blinky.getY(), this.PixelSize*this.blinky.getX(), this.PixelSize, this.PixelSize, null);
-				g2.drawImage(this.ginkey.getImage().getImage(), this.PixelSize*this.ginkey.getY(), this.PixelSize*this.ginkey.getX(), this.PixelSize, this.PixelSize, null);
-
-			//	for (int n=0; n<energyPills.) // we need to add the energy pills
-				
-				this.numOfFood=counter; // updating the amount of food that is still in the board
+				if (i==18 && j==19) // the gate
+					g2.drawImage(this.Frame.getPics().getBlockPic(1).getImage(), this.PixelSize*j, this.PixelSize*i, this.PixelSize, this.PixelSize, null);
 			}
+		this.NumOfNormalPills=counter; // updating the amount of normalPills that are still in the board
+		if (this.Sec%10==0) // changing the fruits position every ten seconds
+			setFoodShown(); 
 
-		this.frame.setTextPoints(this.pacman.getPoints()); // changing the amount of points that are shown to the user 
-		this.frame.setTextLives(this.pacman.getLives()); // changing the amount of lives that are shown to the user 
-		this.frame.setTextFruits(this.pacman.getFruits()); // changing the amount of lives that are shown to the user 
+		// drawing Pacman, the ghosts, the ghosts weapons & the food 
+		paintFruits(g2);
+
+		g2.drawImage(this.Pacman.getImage().getImage(), this.PixelSize*this.Pacman.getY(), this.PixelSize*this.Pacman.getX(), this.PixelSize, this.PixelSize, null);
+		g2.drawImage(this.Inky.getImage().getImage(), this.PixelSize*this.Inky.getY(), this.PixelSize*this.Inky.getX(), this.PixelSize, this.PixelSize, null);
+		g2.drawImage(this.Blinky.getImage().getImage(), this.PixelSize*this.Blinky.getY(), this.PixelSize*this.Blinky.getX(), this.PixelSize, this.PixelSize, null);
+		g2.drawImage(this.Ginkey.getImage().getImage(), this.PixelSize*this.Ginkey.getY(), this.PixelSize*this.Ginkey.getX(), this.PixelSize, this.PixelSize, null);
+		g2.drawImage(this.Pinky.getImage().getImage(), this.PixelSize*this.Pinky.getY(), this.PixelSize*this.Pinky.getX(), this.PixelSize, this.PixelSize, null);
+		g2.drawImage(this.Freaky.getImage().getImage(), this.PixelSize*this.Freaky.getY(), this.PixelSize*this.Freaky.getX(), this.PixelSize, this.PixelSize, null);
+
+		if (this.Blinky.getChase()==true && this.Blinky.getFireBalls().getStartMoving()==true) // adding the weapons
+			g2.drawImage(this.Blinky.getFireBalls().getImage().getImage(), this.PixelSize*this.Blinky.getFireBalls().getY(), this.PixelSize*this.Blinky.getFireBalls().getX(), this.PixelSize, this.PixelSize, null);
+		if (this.Inky.getChase()==true && this.Inky.getWaterSplash().getStartMoving()==true) 
+			g2.drawImage(this.Inky.getWaterSplash().getImage().getImage(), this.PixelSize*this.Inky.getWaterSplash().getY(), this.PixelSize*this.Inky.getWaterSplash().getX(), this.PixelSize, this.PixelSize, null);
+
+		// changing the texts that are shown to the user
+		this.Frame.setTextTime(StringTime); // changing the time that is shown to to user
+		this.Pacman.setSecTime(this.Sec);
+		this.Frame.setTextPoints(this.Pacman.getPoints()); // changing the amount of points that are shown to the user 
+		this.Frame.setTextLives(this.Pacman.getLives()); // changing the amount of lives that are shown to the user 
+		this.Frame.setTextFruits(this.Pacman.getFruits()); // changing the amount of fruits that are shown to the user 
+
+		if (this.StartGame==false) // if the game didn't start
+			showGetReady(); // showing the "Get ready" text
 
 		g.drawImage(offIm, 0, 0, this);
+	}
+
+
+	/**
+	 * This method paints the fruits on the panel.
+	 * @param g2 -the graphics
+	 */
+	private void paintFruits(Graphics g2) {
+		for (int i=0; i<EnergyPill1.length; i++)  //adding the energy pills
+			if (EnergyPill1[i].getEaten()==false && EnergyPill1[i].getShown()==true) 
+				g2.drawImage(this.EnergyPill1[i].getImage(0).getImage(), this.PixelSize*this.EnergyPill1[i].getY(), this.PixelSize*this.EnergyPill1[i].getX(), this.PixelSize, this.PixelSize, null);
+
+		int k=1; // if k=1- showing the fading gif, if k=0- showing the fruit's picture
+		if (this.Sec%10<=3)
+			k=0;
+
+		for (int i=0; i<Pineapple1.length; i++)  //adding the energy pills
+			if (Pineapple1[i].getEaten()==false && Pineapple1[i].getShown()==true) 
+				if (this.Sec%10==1)	{  
+					g2.setColor(Color.BLACK);
+					g2.fillRect(this.PixelSize*this.Pineapple1[i].getY(), this.PixelSize*this.Pineapple1[i].getX(), PixelSize, PixelSize);
+				}
+				else
+					g2.drawImage(this.Pineapple1[i].getImage(k).getImage(), this.PixelSize*this.Pineapple1[i].getY(), this.PixelSize*this.Pineapple1[i].getX(), this.PixelSize, this.PixelSize, null);
+
+		for (int i=0; i<Apple1.length; i++)  //adding the Apple1
+			if (Apple1[i].getEaten()==false && Apple1[i].getShown()==true) 
+				if (this.Sec%10==1)	{  
+					g2.setColor(Color.BLACK);
+					g2.fillRect(this.PixelSize*this.Apple1[i].getY(), this.PixelSize*this.Apple1[i].getX(), PixelSize, PixelSize);
+				}
+				else
+					g2.drawImage(this.Apple1[i].getImage(k).getImage(), this.PixelSize*this.Apple1[i].getY(), this.PixelSize*this.Apple1[i].getX(), this.PixelSize, this.PixelSize, null);
+
+		for (int i=0; i<Strawberry1.length; i++)  //adding the Strawberry1
+			if (Strawberry1[i].getEaten()==false && Strawberry1[i].getShown()==true) 
+				if (this.Sec%10==1)	{  
+					g2.setColor(Color.BLACK);
+					g2.fillRect(this.PixelSize*this.Strawberry1[i].getY(), this.PixelSize*this.Strawberry1[i].getX(), PixelSize, PixelSize);
+				}
+				else
+					g2.drawImage(this.Strawberry1[i].getImage(k).getImage(), this.PixelSize*this.Strawberry1[i].getY(), this.PixelSize*this.Strawberry1[i].getX(), this.PixelSize, this.PixelSize, null);
+
+		for (int i=0; i<Batteries1.length; i++)  //adding the energy pills
+			if (Batteries1[i].getEaten()==false && Batteries1[i].getShown()==true) 
+				if (this.Sec%10==1)	{  
+					g2.setColor(Color.BLACK);
+					g2.fillRect(this.PixelSize*this.Batteries1[i].getY(), this.PixelSize*this.Batteries1[i].getX(), PixelSize, PixelSize);
+				}
+				else
+					g2.drawImage(this.Batteries1[i].getImage(k).getImage(), this.PixelSize*this.Batteries1[i].getY(), this.PixelSize*this.Batteries1[i].getX(), this.PixelSize, this.PixelSize, null);
+
+		for (int i=0; i<Cherry1.length; i++)  //adding the energy pills
+			if (Cherry1[i].getEaten()==false && Cherry1[i].getShown()==true) 
+				if (this.Sec%10==1)	{  
+					g2.setColor(Color.BLACK);
+					g2.fillRect(this.PixelSize*this.Cherry1[i].getY(), this.PixelSize*this.Cherry1[i].getX(), PixelSize, PixelSize);
+				}
+				else
+					g2.drawImage(this.Cherry1[i].getImage(k).getImage(), this.PixelSize*this.Cherry1[i].getY(), this.PixelSize*this.Cherry1[i].getX(), this.PixelSize, this.PixelSize, null);
+	}
+
+
+	private void showGetReady() {
+		JTextField TextGetReady= new JTextField("GET READY");;
+		TextGetReady.setBackground(SystemColor.inactiveCaptionBorder);
+		TextGetReady.setForeground(SystemColor.activeCaptionText);
+		TextGetReady.setFont(new Font("Tahoma", Font.BOLD, 20));
+		TextGetReady.setForeground(Color.WHITE);
+		TextGetReady.setEditable(false);
+		TextGetReady.setBounds(300,410,180,30);
+		TextGetReady.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		TextGetReady.setBackground(Color.BLACK);
+		TextGetReady.setHorizontalAlignment(SwingConstants.CENTER);
+		TextGetReady.setFocusable(false);
+		this.add(TextGetReady);
+	}
+
+
+
+	/**
+	 * This function finds a random place (that is not a wall) for every food (except for the energy pills)
+	 * & sets it to shown.
+	 */
+	private void setFoodShown() {
+		for (int i=0; i<this.Apple1.length; i++) {
+			Apple1[i].setFoodShown();
+		}
+		for (int i=0; i<this.Pineapple1.length; i++) {
+			Pineapple1[i].setFoodShown();
+		}
+		for (int i=0; i<this.Batteries1.length; i++) {
+			Batteries1[i].setFoodShown();
+		}
+		for (int i=0; i<this.Strawberry1.length; i++) {
+			Strawberry1[i].setFoodShown();
+		}
+		for (int i=0; i<this.Cherry1.length; i++) {
+			Cherry1[i].setFoodShown();
+		}
+
 	}
 
 	/**
@@ -129,58 +353,56 @@ public class GamePanel extends JPanel implements KeyListener, TimerListener{
 	 * 
 	 */
 	public void keyPressed(KeyEvent e) {
-		if (this.frame.getPause()==false) { // if the user stopped the game, stopping the pacman from moving 
+		if (this.Frame.getPause()==false) { // if the user stopped the game, stopping the Pacman from moving 
 			if (e.getKeyCode() == KeyEvent.VK_SPACE) { // space starts the game
-				this.startGame=true;
-				this.pacman.setStartMoving(true);
+				this.StartGame=true;
+				this.Pacman.setStartMoving(true);
 			}
-			// checking if the game started and if pacman is frozen
-			if(this.startGame && this.pacman.getFreezeCounter()==0) {
+			// checking if the game started and if Pacman is frozen
+			if(this.StartGame && this.Pacman.getFreezeCounter()==0) {
 				/*
 				 * Checking which way the user wants to go, after that checking if that way has food, if so, 
-				 * updating the amount of food the pacman ate and the board, and moving pacman, if not, moving pacman
+				 * updating the amount of food the Pacman ate and the board, and moving Pacman.
+				 * if that way doesn't have food, moving Pacman to a path.
 				 */
 				if (e.getKeyCode() == KeyEvent.VK_LEFT)
-					if (this.boardGame[pacman.getX()][pacman.getY()-1]==FOOD) {
-						this.boardGame[pacman.getX()][pacman.getY()-1]=PATH;
-						pacman.setY(pacman.getY()-1);
-						this.pacman.setPoints(this.pacman.getPoints()+10);
+					if (this.BoardGame[Pacman.getX()][Pacman.getY()-1]==FOOD) {
+						this.BoardGame[Pacman.getX()][Pacman.getY()-1]=PATH;
+						Pacman.setY(Pacman.getY()-1);
+						this.Pacman.setPoints(this.Pacman.getPoints()+10);
 					}
-					else if(this.boardGame[pacman.getX()][pacman.getY()-1]==PATH) 
-						pacman.setY(pacman.getY()-1);
+					else if(this.BoardGame[Pacman.getX()][Pacman.getY()-1]==PATH) 
+						Pacman.setY(Pacman.getY()-1);
 
 				if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-					if (this.boardGame[pacman.getX()][pacman.getY()+1]==FOOD) {
-						this.boardGame[pacman.getX()][pacman.getY()+1]=PATH;
-						pacman.setY(pacman.getY()+1);
-						this.pacman.setPoints(this.pacman.getPoints()+10);
+					if (this.BoardGame[Pacman.getX()][Pacman.getY()+1]==FOOD) {
+						this.BoardGame[Pacman.getX()][Pacman.getY()+1]=PATH;
+						Pacman.setY(Pacman.getY()+1);
+						this.Pacman.setPoints(this.Pacman.getPoints()+10);
 					}	
-					else if (this.boardGame[pacman.getX()][pacman.getY()+1]==PATH)
-						pacman.setY(pacman.getY()+1);
+					else if (this.BoardGame[Pacman.getX()][Pacman.getY()+1]==PATH)
+						Pacman.setY(Pacman.getY()+1);
 
 				if (e.getKeyCode() == KeyEvent.VK_UP)
-					if (this.boardGame[pacman.getX()-1][pacman.getY()]==FOOD) {
-						this.boardGame[pacman.getX()-1][pacman.getY()]=PATH;
-						pacman.setX(pacman.getX()-1);
-						this.pacman.setPoints(this.pacman.getPoints()+10);
+					if (this.BoardGame[Pacman.getX()-1][Pacman.getY()]==FOOD) {
+						this.BoardGame[Pacman.getX()-1][Pacman.getY()]=PATH;
+						Pacman.setX(Pacman.getX()-1);
+						this.Pacman.setPoints(this.Pacman.getPoints()+10);
 					}
-					else if (this.boardGame[pacman.getX()-1][pacman.getY()]==PATH)
-						pacman.setX(pacman.getX()-1);
+					else if (this.BoardGame[Pacman.getX()-1][Pacman.getY()]==PATH)
+						Pacman.setX(Pacman.getX()-1);
 
 				if (e.getKeyCode() == KeyEvent.VK_DOWN)
-					if (this.boardGame[pacman.getX()+1][pacman.getY()]==FOOD) {
-						this.boardGame[pacman.getX()+1][pacman.getY()]=PATH;
-						pacman.setX(pacman.getX()+1);
-						this.pacman.setPoints(this.pacman.getPoints()+10);
+					if (this.BoardGame[Pacman.getX()+1][Pacman.getY()]==FOOD) {
+						this.BoardGame[Pacman.getX()+1][Pacman.getY()]=PATH;
+						Pacman.setX(Pacman.getX()+1);
+						this.Pacman.setPoints(this.Pacman.getPoints()+10);
 					}
-					else if (this.boardGame[pacman.getX()+1][pacman.getY()]==PATH)
-						pacman.setX(pacman.getX()+1);
-				
-				this.blinky.setPacmanX(this.pacman.getX());
-				this.blinky.setPacmanY(this.pacman.getY());
-				
-				checkAttack(); // checking which creature can attack
-				
+					else if (this.BoardGame[Pacman.getX()+1][Pacman.getY()]==PATH)
+						Pacman.setX(Pacman.getX()+1);
+
+				checkFood();
+
 				repaint();
 			}
 		}
@@ -188,25 +410,81 @@ public class GamePanel extends JPanel implements KeyListener, TimerListener{
 
 	/**
 	 * This function checks which creature can attack, and makes sure that those who can, do.
+	 * DO WE NEED TO CHECK IF THEY'RE FROZZEN??
 	 * 
 	 */
 	private void checkAttack() {
-		if (this.blinky.getStartMoving() && checkPositionBlinky()) // if blinky is out of the cage & he's at the same spot as pacman
-			this.blinky.visit(this.pacman); // blinky visits pacman
+		for (int i=0; i<Ghost.length; i++) {
+			if (this.Ghost[i].getStartMoving() && checkPositionGhost(Ghost[i])) // if Blinky is out of the cage & he's at the same spot as Pacman
+				if (Pacman.getLevel()==1)
+					this.Ghost[i].visit(this.Pacman1); // Blinky visits Pacman1
+				else if (Pacman.getLevel()==2)
+					this.Ghost[i].visit(this.Pacman2); // Blinky visits Pacman2
+				else 
+					this.Ghost[i].visit(this.Pacman3); // Blinky visits Pacman3
+		}
+		if (this.Inky.getWaterSplash().getStartMoving() && Pacman.getX()==this.Inky.getWaterSplash().getX() && Pacman.getY()==this.Inky.getWaterSplash().getY()) {// if inky can move, and 10 seconds have passed, since the last time inky attacked with the water splash
+			if (this.Pacman.getLevel()==2) {
+				this.Inky.getWaterSplash().visit(this.Pacman2);
+			}
+		}
+		else if (this.Blinky.getFireBalls().getStartMoving() && Pacman.getX()==this.Blinky.getFireBalls().getX() && Pacman.getY()==this.Blinky.getFireBalls().getY()) // if Blinky can move, and 10 seconds have passed, since the last time Blinky attacked with the water splash
+			if (this.Pacman.getLevel()==3)
+				this.Blinky.getFireBalls().visit(this.Pacman3);
 
-		if (this.ginkey.getStartMoving() && checkPositionGinkey()) // if ginkey is out of the cage & he's at the same spot as pacman
-			this.ginkey.visit(this.pacman); // ginkey visits pacman
 
-		if (this.inky.getStartMoving() && checkPositionInky())  // if inky is out of the cage & he's at the same spot as pacman
-			this.inky.visit(this.pacman); // inky visits pacman
 
-		if (this.inky.getStartMoving() && this.Sec % 10 == 0) // if inky can move, and 10 seconds have passed, since the last time inky attacked with the water splash
-			this.inky.getWaterSplash().visit(this.pacman);
-			
-		if (this.blinky.getStartMoving() && this.Sec % 10 == 0) // if blinky can move, and 10 seconds have passed, since the last time blinky attacked with the water splash
-			this.blinky.getFireBalls().visit(this.pacman);
 	}
-	
+
+
+	/**
+	 * This function checks if Pacman can eat something
+	 * 
+	 */
+	private void checkFood() {
+		for (int i=0; i<this.EnergyPill1.length; i++)
+			if (EnergyPill1[i].getEaten()==false && this.Pacman.getX()==this.EnergyPill1[i].getX() && this.Pacman.getY()==this.EnergyPill1[i].getY()) 
+			{
+				Pacman.setPoints(Pacman.getPoints()+50);
+				this.EnergyPill1[i].Eated();
+			}
+		for (int i=0; i<this.Pineapple1.length; i++)
+			if (Pineapple1[i].getEaten()==false && this.Pacman.getX()==this.Pineapple1[i].getX() && this.Pacman.getY()==this.Pineapple1[i].getY())
+			{
+				Pacman.setPoints(Pacman.getPoints()+100);
+				Pacman.setFruits(Pacman.getFruits()+1);
+				this.Pineapple1[i].Eated();
+			}
+		for (int i=0; i<this.Apple1.length; i++)
+			if (Apple1[i].getEaten()==false && this.Pacman.getX()==this.Apple1[i].getX() && this.Pacman.getY()==this.Apple1[i].getY())
+			{
+				Pacman.setPoints(Pacman.getPoints()+200);
+				Pacman.setFruits(Pacman.getFruits()+1);
+				this.Apple1[i].Eated();
+			}
+		for (int i=0; i<this.Strawberry1.length; i++)
+			if (Strawberry1[i].getEaten()==false && this.Pacman.getX()==this.Strawberry1[i].getX() && this.Pacman.getY()==this.Strawberry1[i].getY())
+			{
+				Pacman.setPoints(Pacman.getPoints()+300);
+				Pacman.setFruits(Pacman.getFruits()+1);
+				this.Strawberry1[i].Eated();
+			}
+		for (int i=0; i<this.Cherry1.length; i++)
+			if (Cherry1[i].getEaten()==false && this.Pacman.getX()==this.Cherry1[i].getX() && this.Pacman.getY()==this.Cherry1[i].getY())
+			{
+				Pacman.setPoints(Pacman.getPoints()+400);
+				Pacman.setFruits(Pacman.getFruits()+1);
+				this.Cherry1[i].Eated();
+			}
+		for (int i=0; i<this.Batteries1.length; i++)
+			if (Batteries1[i].getEaten()==false && this.Pacman.getX()==this.Batteries1[i].getX() && this.Pacman.getY()==this.Batteries1[i].getY())
+			{
+				Pacman.setLives(Pacman.getLives()+1);
+				this.Batteries1[i].Eated();
+			}
+
+	}
+
 	@Override
 	public void keyReleased(KeyEvent e) {
 	}
@@ -216,34 +494,25 @@ public class GamePanel extends JPanel implements KeyListener, TimerListener{
 	}
 
 	/**
-	 * This function checks if Blinky and pacman are in the dame spot.
+	 * This function checks if ghost and Pacman are in the dame spot.
 	 * 
-	 * @return wheter Blinky and pacman are in the same spot.
+	 * @return wheter ghost and Pacman are in the same spot.
 	 */
-	private boolean checkPositionBlinky() {
-		if (pacman.getX()==blinky.getX() && pacman.getY()==blinky.getY()) 
+	private boolean checkPositionGhost(Ghost ghost) {
+		if (Pacman.getX()==ghost.getX() && Pacman.getY()==ghost.getY()) 
 			return true;
 		return false;
 	}
 
 	/**
-	 * This function checks if ginkey and pacman are in the dame spot.
+	 * This function checks if the gust can move to the given position.
 	 * 
-	 * @return wheter ginkey and pacman are in the same spot.
+	 * @param i - the position that is being checked.
+	 * @param j - the position that is being checked.
+	 * @return - whether the gust can move to the given positoin.
 	 */
-	private boolean checkPositionGinkey() {
-		if (pacman.getX()==ginkey.getX() && pacman.getY()==ginkey.getY()) 
-			return true;
-		return false;
-	}
-
-	/**
-	 * This function checks if inky and pacman are in the dame spot.
-	 * 
-	 * @return wheter inky and pacman are in the same spot.
-	 */
-	private boolean checkPositionInky() {
-		if (pacman.getX()==inky.getX() && pacman.getY()==inky.getY()) 
+	public boolean canMove(int i, int j) {
+		if (this.BoardGame[i][j]!=WALL)
 			return true;
 		return false;
 	}
@@ -254,49 +523,83 @@ public class GamePanel extends JPanel implements KeyListener, TimerListener{
 	 */
 	@Override
 	public void action() {
-		if (this.startGame) {
+		checkAttack(); // checking which creature can attack
+
+		if (Frame.isSpeedChanged()) {
+			if (SpeedGame==false) 
+				fastMotion();
+			else
+				slowMotion();
+			SpeedGame=!SpeedGame;
+		}
+		if (this.StartGame) {
 			Sec++;
-			String time = getTime(Sec);
+			getTime(Sec);
 			repaint();
 			if (isLooser()) {
-				new GameOver(this.pacman.getPoints(), this.stringTime, false, this.pics);
-				this.frame.dispose();
+				MyTimer.getInstance().stopTimer();
+				new GameOver(this.Pacman.getPoints(), GamePanel.StringTime, false, this.Pics);
+				this.Frame.dispose();
 			}
-			else if (this.pacman.getLives()>0 && this.numOfFood==0) { // if the user finished the current level
+			else if (this.Pacman.getLives()>0 && this.NumOfNormalPills==0) { // if the user finished the current level
 				if (isWinner()) { // if the user won
-					new GameOver(this.pacman.getPoints(), this.stringTime, true, this.pics);
-					this.frame.dispose();
+					MyTimer.getInstance().stopTimer();
+					new GameOver(this.Pacman.getPoints(), GamePanel.StringTime, true, this.Pics);
+					this.Frame.dispose();
 				}
 				else { // if there is another level to play
 					paintNextLevel();
-					//dispose();
 				}
 			}
 		}
+
 	}
 
 	/**
 	 * This function paints the new panel with the new board.
 	 */
 	private void paintNextLevel(){
-		if (this.pacman.getLevel()==1) {
-			this.pacman.setLevel(2);
-			new GamePanel(this.frame, this.pacman.getLives(), 5);
+		if (this.Pacman.getLevel()==1) {
+			this.StartGame=false;
+			this.Pacman.setStartMoving(false);
+			this.Pacman=new Pacman2(this.Pacman.getLives(), this.Pacman.getPoints(), this.Pacman.getFruits(), this.Pacman.getSecTime());
+			Pacman2=(Pacman2) Pacman;
+			SetBoard(5);
+			this.Frame.setTextLevel(2); // changing the level that is shown to the user 
+			newGame();
 		}
-		else  {
-			this.pacman.setLevel(3);
-			new GamePanel(this.frame, this.pacman.getLives(), 6);
+		else if (this.Pacman.getLevel()==2){
+			this.StartGame=false;
+			this.Pacman.setStartMoving(false);
+			this.Pacman=new Pacman3(this.Pacman.getLives(), this.Pacman.getPoints(), this.Pacman.getFruits(), this.Pacman.getSecTime());
+			Pacman3=(Pacman3)Pacman;
+			SetBoard(6);
+			this.Frame.setTextLevel(3); // changing the level that is shown to the user 
+			newGame();
 		}
+	}
+
+	private void SetBoard(int num) {
+		this.BoardGame=this.Frame.getBoards().getBoard(num);
+	}
+
+	private void newGame() {
+		Ginkey=new Ginkey(19,19,this); 
+		Inky=new Inky(19,18,this); 
+		Blinky=new Blinky(19,20,this); 
+		Pinky=new Pinky(19,21,this);
+		Freaky=new Freaky(19,17,this);
+		initFruits();// reset fruits
 	}
 
 	/**
 	 * This function checks if the user won, if so, returns true.
-	 * The user wins, when pacman still has lives and the level is 3.
+	 * The user wins, when Pacman still has lives and the level is 3.
 	 *
 	 * @return - whether the user won.
 	 */
 	private boolean isWinner() {
-		if (this.pacman.getLevel()==3 && this.pacman.getLives()>0) {
+		if (this.Pacman.getLevel()==3 && this.Pacman.getLives()>0) {
 			return true;
 		}
 		return false;
@@ -304,23 +607,23 @@ public class GamePanel extends JPanel implements KeyListener, TimerListener{
 
 	/**
 	 * This function checks if the user lost, if so, returns true.
-	 * The user loses, when pacman doesn't have any lives.
+	 * The user loses, when Pacman doesn't have any lives.
 	 *
 	 * @return - whether the user lost.
 	 */
 	private boolean isLooser() {
-		if (this.pacman.getLives()==0)
+		if (this.Pacman.getLives()<=0)
 			return true;
 		return false;
 	}
 
 	/**
-	 * This function returns pacman.
+	 * This function returns Frame.
 	 * 
-	 * @return - pacman.
+	 * @return - Frame.
 	 */
-	public Pacman getPacman() {
-		return this.pacman;
+	public GameFrame getFrame() {
+		return this.Frame;
 	}
 
 	/**
@@ -330,7 +633,8 @@ public class GamePanel extends JPanel implements KeyListener, TimerListener{
 	 * @param numSec - the seconds count
 	 * @return string that represents the time.
 	 */
-	static String getTime(int numSec) {
+	private static String getTime(int numSec) {
+
 		//Separate timer to hours, minutes and seconds . 
 		int hours = 0;
 		int checkMinSec = 0;
@@ -389,9 +693,192 @@ public class GamePanel extends JPanel implements KeyListener, TimerListener{
 
 
 		String time = strHours + ":" + strMins + ":" + strSecs; // string to return
-		stringTime=time; // updating stringTime
+		StringTime=time; // updating StringTime
 
 		return time;
+	}
+
+	/**
+	 * This function makes the ghosts go faster
+	 */
+	private void fastMotion() {
+		Ginkey.setSpeed(Ginkey.getSpeed()/2);
+		Inky.setSpeed(Inky.getSpeed()/2);
+		Blinky.setSpeed(Blinky.getSpeed()/2);
+		Freaky.setSpeed(Freaky.getSpeed()/2);
+		Pinky.setSpeed(Pinky.getSpeed()/2);
+	}
+	/**
+	 * This function makes the ghosts go slower
+	 */
+	private void slowMotion() {
+		Ginkey.setSpeed(Ginkey.getSpeed()*2);
+		Inky.setSpeed(Inky.getSpeed()*2);
+		Blinky.setSpeed(Blinky.getSpeed()*2);
+		Freaky.setSpeed(Freaky.getSpeed()*2);
+		Pinky.setSpeed(Pinky.getSpeed()*2);
+	}
+
+
+
+	/**
+	 * This function finds a path for fireBalls.
+	 * FireBalls go threw walls.
+	 * 
+	 * @param fireBalls
+	 * @return an array- in index=0- which direction fireBalls needs to go,
+	 * in index 1- how many steps it needs to make. 
+	 */
+	public int[] getFireBallsPath(FireBalls fireBalls) {
+		int UP=0,DOWN=1,LEFT=2,RIGHT=3;
+		int[] path=new int[2];
+		if (fireBalls.getX()==this.Pacman.getX()) {
+			if (fireBalls.getY()>this.Pacman.getY()) {
+				path[0]=LEFT;
+				path[1]=fireBalls.getY()-this.Pacman.getY();
+			}
+			else {
+				path[0]=RIGHT;
+				path[1]=this.Pacman.getY()-fireBalls.getY();
+			}
+		}
+		else if (fireBalls.getY()==this.Pacman.getY()) {
+			if (fireBalls.getX()>this.Pacman.getX()) {
+				path[0]=UP;
+				path[1]=fireBalls.getX()-this.Pacman.getX();
+			}
+			else {
+				path[0]=DOWN;
+				path[1]=this.Pacman.getX()-fireBalls.getX();
+			}
+		}
+		else if (Math.abs(fireBalls.getX()-this.Pacman.getX()) < Math.abs(fireBalls.getY()-this.Pacman.getY())){
+			if (fireBalls.getX()>this.Pacman.getX()) {
+				path[0]=UP;
+				path[1]=fireBalls.getX()-this.Pacman.getX();
+			}
+			else {
+				path[0]=DOWN;
+				path[1]=this.Pacman.getX()-fireBalls.getX();
+			}
+		}
+		else {
+			if (fireBalls.getY()>this.Pacman.getY()) {
+				path[0]=LEFT;
+				path[1]=fireBalls.getY()-this.Pacman.getY();
+			}
+			else {
+				path[0]=RIGHT;
+				path[1]=this.Pacman.getY()-fireBalls.getY();
+			}
+		}
+		return path;
+	}
+
+
+	/**
+	 * This function finds a path for waterSplash.
+	 * 
+	 * @param waterSplash
+	 * @return an array- in index=0- which direction waterSplash needs to go,
+	 * in index 1- how many steps it needs to make. 
+	 */
+	public int[] getWaterSplashPath(WaterSplash waterSplash) {
+		int UP=0,DOWN=1,LEFT=2,RIGHT=3;
+		Random rand = new Random();
+		int[] path=new int[2];
+		if (waterSplash.getX()==this.Pacman.getX()) {
+			if (waterSplash.getY()>this.Pacman.getY()) 
+				path[0]=LEFT;
+			else 
+				path[0]=RIGHT;
+		}
+		else if (waterSplash.getY()==this.Pacman.getY()) {
+			if (waterSplash.getX()>this.Pacman.getX()) 
+				path[0]=UP;
+			else 
+				path[0]=DOWN;
+		}
+		else {
+			int n=rand.nextInt(4);
+			path[0]=n;
+		}
+		path[1]=findWall(path[0], waterSplash.getX(), waterSplash.getY());
+		return path;
+	}
+
+
+	/**
+	 * This function finds the closest wall to the given indexes from the given side,
+	 * and returns how many step need to be done in order to get to it.
+	 * 
+	 * @param side
+	 * @param indexX
+	 * @param indexY
+	 * @return - how many step need to be done in order to get to the closest wall from the given indexes.
+	 */
+	private int findWall(int side, int indexX, int indexY) {
+		int UP=0,DOWN=1,LEFT=2,RIGHT=3;
+		int foundWall=0;
+		if (side==RIGHT) {
+			for (int i=indexY; i<this.BoardGame.length; i++)
+				if (canMove(indexX, i)) 
+					foundWall++;
+		}
+		else if (side==LEFT) {
+			for (int i=indexY; i>=0; i--)
+				if (canMove(indexX, i))
+					foundWall++;
+		}
+		else if (side==DOWN) {
+			for (int i=indexX; i<this.BoardGame.length; i++)
+				if (canMove(i, indexY))
+					foundWall++;
+		}
+		else { // up
+			for (int i=indexX; i>=0; i--)
+				if (canMove(i, indexY))
+					foundWall++;
+		}
+		return foundWall-1;
+	}
+
+
+
+	/**
+	 * Getters & setters.
+	 */
+
+
+	@Override
+	public int getSpeed() {
+		return 1;
+	}
+
+	public int getPoints() {
+		return Pacman.getPoints();
+	}
+
+	public int getSec() {
+		return this.Sec;
+	}
+
+	public void resetSec() {
+		this.Sec=0;
+		StringTime="00:00:00";
+		
+	}
+
+	public boolean PacmanXBigger(Ghost ghost) {
+		if (this.Pacman.getX()>ghost.getX())
+			return true;
+		return false;
+	}
+
+	public boolean PacmanYBigger(Ghost ghost) {
+		if (this.Pacman.getY()>ghost.getY())
+			return true;
+		return false;
 	}
 }
 

@@ -1,4 +1,4 @@
-package windows;
+package Windows;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -15,30 +15,29 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
-
-import collections.Boards;
-import collections.Pictures;
-import gameBoard.GamePanel;
-import timer.MyTimer;
-import timer.TimerListener;
+import Timer.MyTimer;
+import Collections.Boards;
+import Collections.Pictures;
+import GameBoard.GamePanel;
 
 /**
  * This class represents the window of the game. 
  * This window has text fields & buttons for the user's convenience and the gamePanel- which it the game board.
  *
  */
-public class GameFrame extends JFrame implements TimerListener{
-	private Boards boards; // the boards collection
-	private Pictures pics; // the pictures collection
-	private int chosenBoard; // the number of the board that the user chose
-	private JPanel game; // the game panel (/the game board)
-	private JTextField textTime;
-	private JTextField textPoints;
-	private JTextField textFruits;
-	private JTextField textLives;
-	private boolean fastMotion=false;
-	private boolean pause=false;
-
+public class GameFrame extends JFrame{
+	private Boards Boards; // the boards collection
+	private Pictures Pics; // the pictures collection
+	private int ChosenBoard; // the number of the board that the user chose
+	private JPanel Game; // the game panel (/the game board)
+	private JTextField TextTime;
+	private JTextField TextPoints;
+	private JTextField TextFruits;
+	private JTextField TextLives;
+	private JTextField TextLevel;
+	private boolean SpeedChanged=false;
+	private boolean Pause=false;
+	
 	/**
 	 * GameFrame's constructor.
 	 * this function initializes the buttons, the text fields and the game panel.
@@ -53,10 +52,9 @@ public class GameFrame extends JFrame implements TimerListener{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setBounds(0, 0, 1060, 840); // the size of the window
 
-		this.boards = b;
-		this.pics = p;
-		this.chosenBoard = chosenBoard;
-		MyTimer.getInstance(1).add(this);
+		this.Boards = b;
+		this.Pics = p;
+		this.ChosenBoard = chosenBoard;
 
 		getContentPane().setBackground(SystemColor.inactiveCaptionBorder);
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -82,7 +80,8 @@ public class GameFrame extends JFrame implements TimerListener{
 		JButton btnReturn = new JButton("Return");
 		btnReturn.addActionListener(new ActionListener() { // when the button is pressed opening the Menu window
 			public void actionPerformed(ActionEvent e) {
-				new Menu(pics, new Boards()); // opening the menu window
+				((GamePanel) Game).resetSec();
+				new Menu(Pics, new Boards()); // opening the menu window
 				dispose(); // closing the game window
 			}
 		});
@@ -101,13 +100,15 @@ public class GameFrame extends JFrame implements TimerListener{
 		JButton btnPause = new JButton("Pause");
 		btnPause.addActionListener(new ActionListener() { // when the button is pressed pausing the game
 			public void actionPerformed(ActionEvent e) {
-				if (pause==true) {
-					pause=false;// pause game
-					MyTimer.getInstance(1).startTimer();
+				if (Pause==true) {
+					Pause=false;// pause game
+					btnPause.setText("Pause");
+					MyTimer.getInstance().startTimer();
 				}	
 				else {
-					pause=true;
-					MyTimer.getInstance(1).stopTimer();
+					Pause=true;
+					btnPause.setText("Continue");
+					MyTimer.getInstance().stopTimer();
 				}
 			}
 		});
@@ -144,16 +145,8 @@ public class GameFrame extends JFrame implements TimerListener{
 		JButton btnSpeed = new JButton("Fast motion");
 		btnSpeed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {  // when the button is pressed going into fast motion
-				if (fastMotion) {
-					fastMotion=false;
-					MyTimer.getInstance(1).setTimersDelay(1);
-				}
-				else {
-					fastMotion=true;
-					MyTimer.getInstance(1).setTimersDelay(7);
-				} 
-			}
-		});
+				SpeedChanged=true;
+			}});
 		btnSpeed.setBackground(SystemColor.inactiveCaptionBorder);
 		btnSpeed.setForeground(SystemColor.activeCaptionText);
 		btnSpeed.setFont(new Font("Tahoma", Font.BOLD, 20));
@@ -162,64 +155,75 @@ public class GameFrame extends JFrame implements TimerListener{
 		btnSpeed.setFocusable(false);
 		pnlSpeed.add(btnSpeed); // adding the button to the "pnlSpeed" panel
 
-		textTime = new JTextField("Time: 00:00:00"); // the text filed that holds how much time had passed
-		textTime.setBackground(SystemColor.inactiveCaptionBorder);
-		textTime.setForeground(SystemColor.activeCaptionText);
-		textTime.setFont(new Font("Tahoma", Font.BOLD, 20));
-		textTime.setEditable(false);
-		textTime.setBounds(10, 310, 180, 50);
-		textTime.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		textTime.setHorizontalAlignment(SwingConstants.CENTER);
-		textTime.setFocusable(false);
-		pnlToolBar.add(textTime); // adding the text field to the "pnlToolBar" panel
+		TextTime = new JTextField("Time: 00:00:00"); // the text filed that holds how much time had passed
+		TextTime.setBackground(SystemColor.inactiveCaptionBorder);
+		TextTime.setForeground(SystemColor.activeCaptionText);
+		TextTime.setFont(new Font("Tahoma", Font.BOLD, 20));
+		TextTime.setEditable(false);
+		TextTime.setBounds(10, 310, 180, 50);
+		TextTime.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		TextTime.setHorizontalAlignment(SwingConstants.CENTER);
+		TextTime.setFocusable(false);
+		pnlToolBar.add(TextTime); // adding the text field to the "pnlToolBar" panel
 
-		textPoints = new JTextField("Points: 0"); // the text filed that holds how many points the user has
-		textPoints.setBackground(SystemColor.inactiveCaptionBorder);
-		textPoints.setForeground(SystemColor.activeCaptionText);
-		textPoints.setFont(new Font("Tahoma", Font.BOLD, 20));
-		textPoints.setEditable(false);
-		textPoints.setBounds(10, 380, 180, 50);
-		textPoints.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		textPoints.setHorizontalAlignment(SwingConstants.CENTER);
-		textPoints.setFocusable(false);
-		pnlToolBar.add(textPoints); // adding the text field to the "pnlToolBar" panel
+		TextPoints = new JTextField("Points: 0"); // the text filed that holds how many points the user has
+		TextPoints.setBackground(SystemColor.inactiveCaptionBorder);
+		TextPoints.setForeground(SystemColor.activeCaptionText);
+		TextPoints.setFont(new Font("Tahoma", Font.BOLD, 20));
+		TextPoints.setEditable(false);
+		TextPoints.setBounds(10, 380, 180, 50);
+		TextPoints.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		TextPoints.setHorizontalAlignment(SwingConstants.CENTER);
+		TextPoints.setFocusable(false);
+		pnlToolBar.add(TextPoints); // adding the text field to the "pnlToolBar" panel
 
-		textFruits = new JTextField("Fruits: 0"); // the text filed that holds how many fruits the user collected
-		textFruits.setBackground(SystemColor.inactiveCaptionBorder);
-		textFruits.setForeground(SystemColor.activeCaptionText);
-		textFruits.setFont(new Font("Tahoma", Font.BOLD, 20));
-		textFruits.setEditable(false);
-		textFruits.setBounds(10, 450, 180, 50);
-		textFruits.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		textFruits.setHorizontalAlignment(SwingConstants.CENTER);
-		textFruits.setFocusable(false);
-		pnlToolBar.add(textFruits); // adding the text field to the "pnlToolBar" panel
+		TextFruits = new JTextField("Fruits: 0"); // the text filed that holds how many fruits the user collected
+		TextFruits.setBackground(SystemColor.inactiveCaptionBorder);
+		TextFruits.setForeground(SystemColor.activeCaptionText);
+		TextFruits.setFont(new Font("Tahoma", Font.BOLD, 20));
+		TextFruits.setEditable(false);
+		TextFruits.setBounds(10, 450, 180, 50);
+		TextFruits.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		TextFruits.setHorizontalAlignment(SwingConstants.CENTER);
+		TextFruits.setFocusable(false);
+		pnlToolBar.add(TextFruits); // adding the text field to the "pnlToolBar" panel
 
-		textLives = new JTextField("Lives: 3"); // the text filed that holds how many lives the user has
-		textLives.setBackground(SystemColor.inactiveCaptionBorder);
-		textLives.setForeground(SystemColor.activeCaptionText);
-		textLives.setFont(new Font("Tahoma", Font.BOLD, 20));
-		textLives.setEditable(false);
-		textLives.setBounds(10, 520, 180, 50);
-		textLives.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		textLives.setHorizontalAlignment(SwingConstants.CENTER);
-		textLives.setFocusable(false);
-		pnlToolBar.add(textLives); // adding the text field to the "pnlToolBar" panel
+		TextLives = new JTextField("Lives: 3"); // the text filed that holds how many lives the user has
+		TextLives.setBackground(SystemColor.inactiveCaptionBorder);
+		TextLives.setForeground(SystemColor.activeCaptionText);
+		TextLives.setFont(new Font("Tahoma", Font.BOLD, 20));
+		TextLives.setEditable(false);
+		TextLives.setBounds(10, 520, 180, 50);
+		TextLives.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		TextLives.setHorizontalAlignment(SwingConstants.CENTER);
+		TextLives.setFocusable(false);
+		pnlToolBar.add(TextLives); // adding the text field to the "pnlToolBar" panel
 
+		TextLevel = new JTextField("Level: 1"); // the text filed that holds the level
+		TextLevel.setBackground(SystemColor.inactiveCaptionBorder);
+		TextLevel.setForeground(SystemColor.activeCaptionText);
+		TextLevel.setFont(new Font("Tahoma", Font.BOLD, 20));
+		TextLevel.setEditable(false);
+		TextLevel.setBounds(10, 590, 180, 50);
+		TextLevel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		TextLevel.setHorizontalAlignment(SwingConstants.CENTER);
+		TextLevel.setFocusable(false);
+		pnlToolBar.add(TextLevel); // adding the text field to the "pnlToolBar" panel
 		GridBagConstraints gbc_toolBar = new GridBagConstraints(); // the GridBagConstraints that holds gbc_toolBar 
 		gbc_toolBar.fill = GridBagConstraints.BOTH;
 		getContentPane().add(toolBar, gbc_toolBar); // adding toolBar to gbc_toolBar
 
-		this.game=new GamePanel(this, 3, chosenBoard); // creating a new game panel 
+		this.Game=new GamePanel(this, chosenBoard); // creating a new game panel 
 		GridBagConstraints gbc_gamePanel = new GridBagConstraints();
 		gbc_gamePanel.insets = new Insets(10, 10, 10, 10);
 		gbc_gamePanel.fill = GridBagConstraints.BOTH;
 		gbc_gamePanel.gridx = 2;
 		gbc_gamePanel.gridy = 0;
-		getContentPane().add(this.game, gbc_gamePanel); // adding this game panel to gbc_gamePanel
+		getContentPane().add(this.Game, gbc_gamePanel); // adding this game panel to gbc_gamePanel
 
 		setVisible(true);
 	}
+
 
 	/**
 	 * This function returns boards.
@@ -227,7 +231,7 @@ public class GameFrame extends JFrame implements TimerListener{
 	 * @return this boards.
 	 */
 	public Boards getBoards() {
-		return this.boards;
+		return this.Boards;
 	}
 
 	/**
@@ -236,7 +240,7 @@ public class GameFrame extends JFrame implements TimerListener{
 	 * @return this pics.
 	 */
 	public Pictures getPics() {
-		return this.pics;
+		return this.Pics;
 	}
 
 	/**
@@ -245,7 +249,7 @@ public class GameFrame extends JFrame implements TimerListener{
 	 * @return this chosenBoard.
 	 */
 	public int getChosenBoard() {
-		return this.chosenBoard;
+		return this.ChosenBoard;
 	}
 
 	/**
@@ -254,7 +258,7 @@ public class GameFrame extends JFrame implements TimerListener{
 	 * @param time - the new time that needs to be shown to the user.
 	 */
 	public void setTextTime(String time) {
-		this.textTime.setText("Time: "+time); 
+		this.TextTime.setText("Time: "+time); 
 	}
 
 	/**
@@ -263,7 +267,7 @@ public class GameFrame extends JFrame implements TimerListener{
 	 * @param points - the new amount of points that needs to be shown to the user.
 	 */
 	public void setTextPoints(int points) {
-		this.textPoints.setText("Points: "+points); 
+		this.TextPoints.setText("Points: "+points); 
 	}
 
 	/**
@@ -272,7 +276,7 @@ public class GameFrame extends JFrame implements TimerListener{
 	 * @param fruits - the new amount of fruits that needs to be shown to the user.
 	 */
 	public void setTextFruits(int fruits) {
-		this.textFruits.setText("Fruits: "+fruits); 
+		this.TextFruits.setText("Fruits: "+fruits); 
 	}
 
 	/**
@@ -281,16 +285,28 @@ public class GameFrame extends JFrame implements TimerListener{
 	 * @param lives - the new amount of lives that needs to be shown to the user.
 	 */
 	public void setTextLives(int lives) {
-		this.textLives.setText("Lives: "+lives);
+		this.TextLives.setText("Lives: "+lives);
 	}
 
 	/**
-	 * This function returns whether the game needs to be in fast motion or not.
+	 * This function sets the level that is shown to the user.
 	 * 
-	 * @return - whether the game needs to be in fast motion or not.
+	 * @param level - the new level that needs to be shown to the user.
 	 */
-	public boolean getFastMotion() {
-		return this.fastMotion;
+	public void setTextLevel(int level) {
+		this.TextLevel.setText("Level: "+level);
+	}
+	
+	/**
+	 * This function returns whether the speed was changed
+	 * @return if the speed changed
+	 */
+	public boolean isSpeedChanged() {
+		if (SpeedChanged==true) {
+			SpeedChanged=false;
+			return true;
+		}
+		return SpeedChanged;
 	}
 
 	/**
@@ -299,11 +315,6 @@ public class GameFrame extends JFrame implements TimerListener{
 	 * @return - whether the game needs to be paused or not.
 	 */
 	public boolean getPause() {
-		return this.pause;
-	}
-
-	@Override
-	public void action() {
-
+		return this.Pause;
 	}
 }

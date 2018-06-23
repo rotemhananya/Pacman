@@ -1,4 +1,4 @@
-package visitInterface;
+package VisitInterface;
 
 /**
  * This class represents the visited interface

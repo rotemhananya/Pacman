@@ -1,0 +1,41 @@
+package Food;
+
+import javax.swing.ImageIcon;
+
+import GameBoard.GamePanel;
+
+public class Pineapple  extends Food {
+
+	/**
+	 * Pineapple's constructor.
+	 * 
+	 * @param x - the Pineapple's position.
+	 * @param y - the Pineapple's position.
+	 */
+	public Pineapple(int x, int y, GamePanel gamePanel) {
+		super(x, y, gamePanel);
+	}
+	
+
+	/**
+	 * Constructor without location 
+	 */
+	public Pineapple(GamePanel gamePanel) {
+		super(gamePanel);
+	
+	}
+
+
+	public void Eated() {
+		this.Eaten=true;
+		this.Shown=false;
+	}
+	
+	public ImageIcon getImage(int i) {
+		if (i==0)
+			return GamePanel.getFrame().getPics().getFoodPic(2);
+		else
+			return GamePanel.getFrame().getPics().getFoodPicsFade(0);
+	}
+}
+

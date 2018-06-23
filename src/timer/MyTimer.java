@@ -1,4 +1,4 @@
-package timer;
+package Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -13,17 +13,18 @@ public class MyTimer {
 	// code to maintain listeners
 	private ArrayList<TimerListener> listeners;
 	private Timer timer ;
+	private int cnt=0;
 	private static MyTimer instance = null;
-	
+
 	/** 
 	 * static method to create instance of Singleton class.
 	 * 
 	 * @param delay - the delay of the timer.
 	 * @return - MyTimer instance.
 	 */
-	public static MyTimer getInstance(int delay){
+	public static MyTimer getInstance(){
 		if (instance == null)
-			instance = new MyTimer(delay);
+			instance = new MyTimer();
 		return instance;
 	}
 
@@ -33,16 +34,19 @@ public class MyTimer {
 	 * 
 	 * @param delay - the delay of the timer.
 	 */
-	private MyTimer(int delay){
+	private MyTimer(){
 		listeners = new ArrayList<TimerListener>();
-		timer = new Timer(1000*delay,new ActionListener() {
+		timer = new Timer(1000,new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				int i=0;
 				while(listeners.size() > i) {
-					listeners.get(i).action();
+					int speed=listeners.get(i).getSpeed();
+					if (cnt%speed==0)
+						listeners.get(i).action();
 					i++;
 				}
+				cnt++;
 			}    
 		});
 		timer.start();
@@ -58,15 +62,6 @@ public class MyTimer {
 	}
 
 	/**
-	 * This function sets the timer's delay.
-	 * 
-	 * @param speed - the delay.
-	 */
-	public void setTimersDelay(int speed) {
-		this.timer.setDelay(1000/speed);
-	}
-
-	/**
 	 * This function stops the timer.
 	 */
 	public void stopTimer() {
@@ -79,7 +74,4 @@ public class MyTimer {
 	public void startTimer() {
 		this.timer.start();
 	}
-	
-	
-
 }
